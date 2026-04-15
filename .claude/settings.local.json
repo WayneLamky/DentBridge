@@ -11,7 +11,8 @@
       "Bash(claude mcp:*)",
       "Bash(npm run:*)",
       "Bash(git config:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(ssh -T git@github.com)"
     ]
   }
 }
