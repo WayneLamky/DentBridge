@@ -13,4 +13,27 @@ html {
 body {
   margin: 0;
   font-family: var(--font-sans);
+  background-color: #000;
+}
+
+/* 键盘可见的焦点：仅在键盘 focus 时显示，避免鼠标点击时出现黑框 */
+/* 键盘可见的焦点：蓝色 outline 在黑白背景上均清晰可见 */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 尊重系统「减少动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }

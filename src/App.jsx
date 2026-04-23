@@ -3,21 +3,33 @@ import { ArrowRight, Globe, FileText, CheckCircle, ChevronDown, MapPin } from 'l
 
 const EASE = 'cubic-bezier(0.16,1,0.3,1)';
 
+// 是否偏好「减少动画」
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 // Scroll-triggered reveal hook using Intersection Observer
 function useReveal(threshold = 0.15) {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+  // 若用户偏好减少动画，直接视为可见，跳过过渡
+  const [visible, setVisible] = useState(() => prefersReducedMotion());
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || visible) return;
+    // 无 IntersectionObserver（极老浏览器）兜底：直接显示
+    if (typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.unobserve(el); } },
       { threshold }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold]);
+  }, [threshold, visible]);
 
   return [ref, visible];
 }
@@ -90,6 +102,12 @@ export default function App() {
     // eslint-disable-next-line no-console
     console.log('[DentBridge] 表单已提交:', formData);
     setSubmitted(true);
+  };
+
+  const resetForm = () => {
+    setFormData(INITIAL_FORM);
+    setFormError('');
+    setSubmitted(false);
   };
 
   return (
@@ -354,7 +372,7 @@ export default function App() {
                             value={item}
                             checked={formData.language === item}
                             onChange={updateField('language')}
-                            className="hidden"
+                            className="sr-only"
                           />
                           <span className="font-medium text-xs md:text-sm text-black">{item}</span>
                         </label>
@@ -403,6 +421,16 @@ export default function App() {
                 >
                   {submitted ? '✓ 已收到，我们将在 24 小时内联系您' : '提交并接收评估报告'}
                 </button>
+
+                {submitted && (
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="w-full mt-3 text-sm font-semibold text-black underline underline-offset-4 hover:text-neutral-600 transition-colors"
+                  >
+                    再提交一份
+                  </button>
+                )}
 
                 <p className="text-xs text-center text-neutral-400 mt-4">
                   点击提交即代表您同意 DentBridge 的隐私政策，我们将向您的邮箱发送自动化评估结果。
@@ -455,7 +483,7 @@ export default function App() {
                         className="w-full text-left bg-neutral-900 rounded-2xl p-6 cursor-pointer hover:bg-neutral-800 hover:scale-[1.02] transition-all duration-300 ease-out border border-neutral-800"
                       >
                         <div className="flex justify-between items-center">
-                          <h4 className="font-semibold pr-4">{faq.q}</h4>
+                          <span className="font-semibold pr-4">{faq.q}</span>
                           <ChevronDown className={`w-5 h-5 text-neutral-500 flex-shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                         </div>
                         {isOpen && (

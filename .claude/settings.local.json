@@ -12,7 +12,8 @@
       "Bash(npm run:*)",
       "Bash(git config:*)",
       "Bash(gh auth:*)",
-      "Bash(ssh -T git@github.com)"
+      "Bash(ssh -T git@github.com)",
+      "Bash(curl -sL https://waynelamky.github.io/DentBridge/)"
     ]
   }
 }
